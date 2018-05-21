@@ -10,6 +10,7 @@ time $PSQL -qc "REFRESH MATERIALIZED VIEW ethereum_classic_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW cardano_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW ripple_payment_xrp_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW stellar_payment_stats"
+time $PSQL -qc "REFRESH MATERIALIZED VIEW stellar_payment_stats_prep"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW monero_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW nem_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW neo_stats"
@@ -35,6 +36,8 @@ $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date
 # ripple XRP payments
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fee\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"block_cnt\" \"blockCount\", \"missing_block_cnt\" \"missingBlockCount\", \"total_cnt\" \"totalTxCount\", \"missing_cnt\" \"missingTxCount\" FROM ripple_payment_xrp_stats ORDER BY \"date\"" -A -F "," -o "ripple_payment_xrp.csv"
 
+# stellar payments
+$PSQL -qc "\\pset footer off" -c "SELECT * FROM stellar_payment_stats_prep ORDER BY \"date\"" -A -F "," -o "stellar_payment.csv"
 # stellar XLM payments
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM stellar_payment_stats WHERE \"asset\" = '' ORDER BY \"date\"" -A -F "," -o "stellar_payment_xlm.csv"
 
