@@ -4,7 +4,7 @@ This repo contains a few scripts for blockchain analytics used by [CoinMetrics.i
 
 ## Status
 
-This repo is by no means complete. Also CoinMetrics systems are not transitioned yet to use the exact versions of the scripts published in this repository (but will be soon). Therefore scripts released here may differ from actual scripts running on CoinMetrics servers and may be not fully tested. Please use with caution.
+This repo is by no means complete. CoinMetrics systems are being transitioned to use the exact versions of the scripts published in this repository, therefore scripts released here may differ from actual scripts running on CoinMetrics servers at the moment and may be not fully tested. Please use with caution.
 
 ## Usage
 
