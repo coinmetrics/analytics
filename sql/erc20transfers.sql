@@ -21,6 +21,7 @@ CREATE MATERIALIZED VIEW erc20transfers AS (
       COUNT(*) "cnt",
       SUM(txc."value") "value",
       MAX(txc."value") "max_value",
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY txc."value") "med_value",
       MAX(txc."sum_from_value") "max_sum_from_value",
       MAX(txc."sum_to_value") "max_sum_to_value",
       COUNT(DISTINCT txc."from") "from_cnt",
