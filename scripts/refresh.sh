@@ -25,10 +25,10 @@ do
 done
 
 # ethereum
-$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"tx_cnt\" \"txCount\", \"sum_value\" \"txVolume\", \"med_value\" \"medValue\", \"avg_difficulty\" \"avgDifficulty\", \"avg_tx_size\" \"avgTxSize\", \"sum_fee\" \"sumFee\", \"block_cnt\" \"blockCount\", \"sum_size\" \"totalSize\", \"med_fee\" \"medFee\", \"reward\" \"generatedVolume\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM ethereum_stats ORDER BY \"date\"" -A -F "," -o "eth_stats.csv"
+$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"tx_cnt\" \"txCount\", \"sum_value\" \"txVolume\", \"med_value\" \"medValue\", \"avg_difficulty\" \"avgDifficulty\", \"avg_tx_size\" \"avgTxSize\", \"sum_fee\" \"sumFee\", \"block_cnt\" \"blockCount\", \"sum_size\" \"totalSize\", \"med_fee\" \"medFee\", \"reward\" \"generatedVolume\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"payment_cnt\" \"paymentCount\" FROM ethereum_stats ORDER BY \"date\"" -A -F "," -o "eth_stats.csv"
 
 # ethereum classic
-$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"tx_cnt\" \"txCount\", \"sum_value\" \"txVolume\", \"med_value\" \"medValue\", \"avg_difficulty\" \"avgDifficulty\", \"avg_tx_size\" \"avgTxSize\", \"sum_fee\" \"sumFee\", \"block_cnt\" \"blockCount\", \"sum_size\" \"totalSize\", \"med_fee\" \"medFee\", \"reward\" \"generatedVolume\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM ethereum_classic_stats ORDER BY \"date\"" -A -F "," -o "eth_classic_stats.csv"
+$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"tx_cnt\" \"txCount\", \"sum_value\" \"txVolume\", \"med_value\" \"medValue\", \"avg_difficulty\" \"avgDifficulty\", \"avg_tx_size\" \"avgTxSize\", \"sum_fee\" \"sumFee\", \"block_cnt\" \"blockCount\", \"sum_size\" \"totalSize\", \"med_fee\" \"medFee\", \"reward\" \"generatedVolume\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"payment_cnt\" \"paymentCount\" FROM ethereum_classic_stats ORDER BY \"date\"" -A -F "," -o "eth_classic_stats.csv"
 
 # cardano
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"volume\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM cardano_stats ORDER BY \"date\"" -A -F "," -o "cardano.csv"

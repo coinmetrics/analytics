@@ -14,7 +14,8 @@ CREATE MATERIALIZED VIEW ethereum_classic_stats AS (
       tx."value" :: NUMERIC * 1e-18 "value",
       tx."gasUsed" :: NUMERIC * tx."gasPrice" :: NUMERIC * 1e-18 "totalGasPrice",
       tx."from" "from",
-      tx."to" "to"
+      tx."to" "to",
+      tx."contractAddress" "contractAddress"
       FROM ethereum_classic block, UNNEST(block.transactions) tx),
     blocks_stats AS (SELECT
       block."date" "date",
@@ -38,6 +39,12 @@ CREATE MATERIALIZED VIEW ethereum_classic_stats AS (
       COUNT(DISTINCT tx."from") "from_cnt",
       COUNT(DISTINCT tx."to") "to_cnt"
       FROM txs tx GROUP BY tx."date"),
+    payments_stats AS (SELECT
+      tx."date" "date",
+      COUNT(*) "cnt"
+      FROM txs tx LEFT JOIN txs contract ON tx."to" = contract."contractAddress"
+      WHERE tx."to" IS NOT NULL AND contract."contractAddress" IS NULL
+      GROUP BY tx."date"),
     addr_stats AS (SELECT
       t."date" "date",
       COUNT(DISTINCT t."addr") "cnt"
@@ -56,6 +63,7 @@ CREATE MATERIALIZED VIEW ethereum_classic_stats AS (
     SELECT
       block."date" "date",
       tx."cnt" "tx_cnt",
+      payment."cnt" "payment_cnt",
       tx."sum_value" "sum_value",
       tx."med_value" "med_value",
       block."avg_difficulty" "avg_difficulty",
@@ -71,6 +79,7 @@ CREATE MATERIALIZED VIEW ethereum_classic_stats AS (
     FROM blocks_stats block
     LEFT JOIN uncles_stats uncle ON block."date" = uncle."date"
     LEFT JOIN txs_stats tx ON block."date" = tx."date"
+    LEFT JOIN payments_stats payment ON block."date" = payment."date"
     LEFT JOIN addr_stats addr ON block."date" = addr."date"
     ORDER BY "date"
   ) WITH NO DATA;
