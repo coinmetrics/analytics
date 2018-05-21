@@ -4,35 +4,42 @@ CREATE MATERIALIZED VIEW cardano_stats AS (
       (SELECT
         tx."id" "txid",
         input."address" "address",
-        -input."value" "value"
+        -input."value" "value",
+        0 :: INTEGER "is_output"
         FROM cardano block, UNNEST(block.transactions) tx, UNNEST(tx.inputs) input
         )
       UNION ALL
       (SELECT
         tx."id" "txid",
         output."address" "address",
-        output."value" "value"
+        output."value" "value",
+        1 :: INTEGER "is_output"
         FROM cardano block, UNNEST(block.transactions) tx, UNNEST(tx.outputs) output
         )
       ),
     txio AS (SELECT
       "txid",
       "address",
-      SUM("value") * 0.000001 "value"
+      SUM("value") * 0.000001 "value",
+      SUM("is_output") "output_cnt"
       FROM tp
       GROUP BY "txid", "address"
       ),
     txq AS (SELECT
       "txid",
       -SUM("value") "fees",
-      SUM(GREATEST("value", 0)) "volume"
+      SUM(GREATEST("value", 0)) "volume",
+      GREATEST(SUM("output_cnt") - 1, 0) "payment_cnt"
       FROM txio GROUP BY "txid"
       ),
     txs AS (SELECT
       DATE_TRUNC('day', TO_TIMESTAMP(tx."timeIssued")) "date",
       COUNT(*) "cnt",
       SUM(txq."fees") "fees",
-      SUM(txq."volume") "volume"
+      SUM(txq."volume") "volume",
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY txq."volume") "med_volume",
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY txq."fees") "med_fees",
+      SUM(txq."payment_cnt") "payment_cnt"
       FROM cardano block, UNNEST(block.transactions) tx INNER JOIN txq ON tx."id" = txq."txid"
       GROUP BY "date"
       ),
@@ -67,8 +74,11 @@ CREATE MATERIALIZED VIEW cardano_stats AS (
     SELECT
       txs."date" "date",
       txs."cnt" "cnt",
-      txs."fees" "fees",
       txs."volume" "volume",
+      txs."fees" "fees",
+      txs."med_volume" "med_volume",
+      txs."med_fees" "med_fees",
+      txs."payment_cnt" "payment_cnt",
       tis."from_cnt" "from_cnt",
       tos."to_cnt" "to_cnt",
       tios."cnt" "addr_cnt"
