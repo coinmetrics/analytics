@@ -36,7 +36,9 @@ CREATE MATERIALIZED VIEW neo_stats AS (
       txio."asset" "asset",
       COUNT(*) "cnt",
       SUM(tx."sys_fee" + tx."net_fee") "fees",
-      SUM(txio."value") "value"
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ((tx."sys_fee" + tx."net_fee") :: DOUBLE PRECISION)) "med_fees",
+      SUM(txio."value") "value",
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY (txio."value" :: DOUBLE PRECISION)) "med_value"
       FROM neo block, UNNEST(block.tx) tx INNER JOIN txio ON tx."txid" = txio."txid"
       GROUP BY "date", "asset" ORDER BY "date", "asset"
       ),
@@ -73,7 +75,9 @@ CREATE MATERIALIZED VIEW neo_stats AS (
       blocks_stats."asset" "asset",
       blocks_stats."cnt" "cnt",
       blocks_stats."fees" "fees",
+      blocks_stats."med_fees" "med_fees",
       blocks_stats."value" "value",
+      blocks_stats."med_value" "med_value",
       in_addr_stats."from_cnt" "from_cnt",
       out_addr_stats."to_cnt" "to_cnt",
       addr_stats."addr_cnt" "addr_cnt"
