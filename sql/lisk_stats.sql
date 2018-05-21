@@ -12,6 +12,8 @@ CREATE MATERIALIZED VIEW lisk_stats AS (
       ),
     tx_stats AS (SELECT
       DATE_TRUNC('day', TIMESTAMP '2016-05-24 20:00:00' + tx."timestamp" * INTERVAL '1 second') "date",
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY tx."amount") "med_value",
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY tx."fee") "med_fees",
       COUNT(DISTINCT tx."senderId") "from_cnt",
       COUNT(DISTINCT tx."recipientId") "to_cnt"
       FROM trs tx
@@ -39,6 +41,8 @@ CREATE MATERIALIZED VIEW lisk_stats AS (
       blocks_stats."cnt" "cnt",
       blocks_stats."value" "value",
       blocks_stats."fees" "fees",
+      tx_stats."med_value" "med_value",
+      tx_stats."med_fees" "med_fees",
       tx_stats."from_cnt" "from_cnt",
       tx_stats."to_cnt" "to_cnt",
       addr_stats."addr_cnt" "addr_cnt"
