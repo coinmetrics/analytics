@@ -21,7 +21,7 @@ time $PSQL -qc "REFRESH MATERIALIZED VIEW lisk_stats" lisk_main lisk
 # ERC20 tokens
 for SYMBOL in $($PSQL -qtc "SELECT symbol FROM erc20tokens")
 do
-	$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"max_value\" \"maxOneTxVolume\", \"max_sum_from_value\" \"maxAddrSumFromValue\", \"max_sum_to_value\" \"maxAddrSumToValue\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM erc20transfers WHERE \"symbol\" = '$SYMBOL' ORDER BY \"date\"" -A -F "," -o "$SYMBOL.csv"
+	$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"max_value\" \"maxOneTxVolume\", \"med_value\" \"medValue\", \"max_sum_from_value\" \"maxAddrSumFromValue\", \"max_sum_to_value\" \"maxAddrSumToValue\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM erc20transfers WHERE \"symbol\" = '$SYMBOL' ORDER BY \"date\"" -A -F "," -o "$SYMBOL.csv"
 done
 
 # ethereum

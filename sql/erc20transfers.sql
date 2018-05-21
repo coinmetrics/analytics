@@ -54,6 +54,7 @@ CREATE MATERIALIZED VIEW erc20transfers AS (
       txs."cnt" "cnt",
       txs."value" "value",
       txs."max_value" "max_value",
+      txs."med_value" "med_value",
       txs."max_sum_from_value" "max_sum_from_value",
       txs."max_sum_to_value" "max_sum_to_value",
       txs."from_cnt" "from_cnt",
