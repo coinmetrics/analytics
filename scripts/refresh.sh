@@ -42,7 +42,7 @@ $PSQL -qc "\\pset footer off" -c "SELECT * FROM stellar_payment_stats_prep ORDER
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM stellar_payment_stats WHERE \"asset\" = '' ORDER BY \"date\"" -A -F "," -o "stellar_payment_xlm.csv"
 
 # monero
-$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"reward\" - \"fees\" \"generatedCoins\", \"fees\" \"fees\" FROM monero_stats ORDER BY \"date\"" -A -F "," -o "monero.csv"
+$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"reward\" - \"fees\" \"generatedCoins\", \"fees\" \"fees\", \"avg_difficulty\" \"avgDifficulty\", \"med_fees\" \"medFees\", \"io_cnt\" \"addrCount\", \"payment_cnt\" \"paymentCount\" FROM monero_stats ORDER BY \"date\"" -A -F "," -o "monero.csv"
 
 # nem
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM nem_stats ORDER BY \"date\"" -A -F "," -o "nem.csv"
