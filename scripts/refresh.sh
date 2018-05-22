@@ -45,7 +45,7 @@ $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"reward\" - \"fees\" \"generatedCoins\", \"fees\" \"fees\", \"avg_difficulty\" \"avgDifficulty\", \"med_fees\" \"medFees\", \"io_cnt\" \"addrCount\", \"payment_cnt\" \"paymentCount\" FROM monero_stats ORDER BY \"date\"" -A -F "," -o "monero.csv"
 
 # nem
-$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM nem_stats ORDER BY \"date\"" -A -F "," -o "nem.csv"
+$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"med_value\" \"medTxVolume\", \"med_fees\" \"medFees\" FROM nem_stats ORDER BY \"date\"" -A -F "," -o "nem.csv"
 
 # neo
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"med_fees\" \"medFees\", \"med_value\" \"medTxVolume\" FROM neo_stats WHERE \"asset\" = '\\x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7' ORDER BY \"date\"" -A -F "," -o "neo_gas.csv"
