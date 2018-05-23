@@ -19,12 +19,12 @@ CREATE MATERIALIZED VIEW ethereum_short_tx AS (
           (SELECT
             block."timestamp" "time",
             tx."from" "address",
-            -tx."value" * 1e-18 "value"
+            -(tx."value" :: NUMERIC + tx."gasUsed" :: NUMERIC * tx."gasPrice" :: NUMERIC) * 1e-18 "value"
             FROM ethereum block, UNNEST(block.transactions) tx
             )
         ) t
         GROUP BY t."address"
-        HAVING MAX(t."time") - MIN(t."time") <= 86400 AND SUM(t."value") <= SUM(GREATEST(t."value", 0)) * 0.01
+        HAVING MAX(t."time") - MIN(t."time") <= 86400 AND SUM(t."value") = 0
       ) t
     GROUP BY "date" ORDER BY "date"
   ) WITH NO DATA;
