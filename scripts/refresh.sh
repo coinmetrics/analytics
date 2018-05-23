@@ -15,6 +15,7 @@ time $PSQL -qc "REFRESH MATERIALIZED VIEW monero_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW nem_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW neo_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW lisk_stats" lisk_main lisk
+time $PSQL -qc "REFRESH MATERIALIZED VIEW ethereum_short_tx"
 
 ### export csv's
 
@@ -25,7 +26,7 @@ do
 done
 
 # ethereum
-$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"tx_cnt\" \"txCount\", \"sum_value\" \"txVolume\", \"med_value\" \"medTxVolume\", \"avg_difficulty\" \"avgDifficulty\", \"avg_tx_size\" \"avgTxSize\", \"sum_fee\" \"sumFee\", \"block_cnt\" \"blockCount\", \"sum_size\" \"totalSize\", \"med_fee\" \"medFee\", \"reward\" \"generatedVolume\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"payment_cnt\" \"paymentCount\" FROM ethereum_stats ORDER BY \"date\"" -A -F "," -o "eth_stats.csv"
+$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(e.\"date\"::TEXT FOR 10) \"date\", e.\"tx_cnt\" \"txCount\", e.\"sum_value\" \"txVolume\", e.\"med_value\" \"medTxVolume\", e.\"avg_difficulty\" \"avgDifficulty\", e.\"avg_tx_size\" \"avgTxSize\", e.\"sum_fee\" \"sumFee\", e.\"block_cnt\" \"blockCount\", e.\"sum_size\" \"totalSize\", e.\"med_fee\" \"medFee\", e.\"reward\" \"generatedVolume\", e.\"from_cnt\" \"fromAddrCount\", e.\"to_cnt\" \"toAddrCount\", e.\"addr_cnt\" \"addrCount\", e.\"payment_cnt\" \"paymentCount\", es.\"cnt\" \"shortTxCount\", es.\"value\" \"shortTxValue\" FROM ethereum_stats e LEFT JOIN ethereum_short_tx es ON e.\"date\" = es.\"date\" ORDER BY e.\"date\"" -A -F "," -o "eth_stats.csv"
 
 # ethereum classic
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"tx_cnt\" \"txCount\", \"sum_value\" \"txVolume\", \"med_value\" \"medTxVolume\", \"avg_difficulty\" \"avgDifficulty\", \"avg_tx_size\" \"avgTxSize\", \"sum_fee\" \"sumFee\", \"block_cnt\" \"blockCount\", \"sum_size\" \"totalSize\", \"med_fee\" \"medFee\", \"reward\" \"generatedVolume\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"payment_cnt\" \"paymentCount\" FROM ethereum_classic_stats ORDER BY \"date\"" -A -F "," -o "eth_classic_stats.csv"
@@ -53,3 +54,6 @@ $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date
 
 # lisk
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"med_value\" \"medTxVolume\", \"med_fees\" \"medFees\", \"payment_cnt\" \"paymentCount\" FROM lisk_stats ORDER BY \"date\"" -A -F "," -o "lisk.csv" lisk_main lisk
+
+# ethereum short tx
+$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\" FROM ethereum_short_tx ORDER BY \"date\"" -A -F "," -o "eth_short_tx.csv"
