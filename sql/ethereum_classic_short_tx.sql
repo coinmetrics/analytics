@@ -15,7 +15,7 @@ CREATE MATERIALIZED VIEW ethereum_classic_short_tx AS (
             tx."value" * 1e-18 "value"
             FROM ethereum_classic block, UNNEST(block.transactions) tx
             )
-          UNION
+          UNION ALL
           (SELECT
             block."timestamp" "time",
             tx."from" "address",
