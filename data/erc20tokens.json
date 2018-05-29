@@ -238,5 +238,53 @@
 		"name": "Zilliqa",
 		"symbol": "ZIL",
 		"decimals": 12
+	},
+	{
+		"contractAddress": "0x68d57c9a1c35f63e2c83ee8e49a64e9d70528d25",
+		"name": "SIRIN LABS Token",
+		"symbol": "SRN",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0xbf2179859fc6d5bee9bf9158632dc51678a4100e",
+		"name": "ELF",
+		"symbol": "ELF",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0x4CEdA7906a5Ed2179785Cd3A40A69ee8bc99C466",
+		"name": "Aion",
+		"symbol": "AION",
+		"decimals": 8
+	},
+	{
+		"contractAddress": "0x9992ec3cf6a55b00978cddf2b27bc6882d88d1ec",
+		"name": "Polymath",
+		"symbol": "POLY",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0x5d65D971895Edc438f465c17DB6992698a52318D",
+		"name": "Nebulas",
+		"symbol": "NAS",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0xa4e8c3ec456107ea67d3075bf9e3df3a75823db0",
+		"name": "Loom Network",
+		"symbol": "LOOM",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0x595832f8fc6bf59c85c527fec3740a1b7a361269",
+		"name": "Power Ledger",
+		"symbol": "POWR",
+		"decimals": 6
+	},
+	{
+		"contractAddress": "0xf0ee6b27b759c9893ce4f094b49ad28fd15a23e4",
+		"name": "Enigma",
+		"symbol": "ENG",
+		"decimals": 8
 	}
 ]
