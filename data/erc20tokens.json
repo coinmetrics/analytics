@@ -286,5 +286,23 @@
 		"name": "Enigma",
 		"symbol": "ENG",
 		"decimals": 8
+	},
+	{
+		"contractAddress": "0xea11755ae41d889ceec39a63e6ff75a02bc1c00d",
+		"name": "Cortex",
+		"symbol": "CTXC",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0x1122b6a0e00dce0563082b6e2953f3a943855c1f",
+		"name": "Centrality",
+		"symbol": "CENNZ",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0x618e75ac90b12c6049ba3b27f5d5f8651b0037f6",
+		"name": "QASH",
+		"symbol": "QASH",
+		"decimals": 6
 	}
 ]
