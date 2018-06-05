@@ -1,9 +1,9 @@
 -- Lisk stats
--- genesis block time is 2016-05-24 20:00:00
+-- genesis block time is 2016-05-24 17:00:00
 CREATE MATERIALIZED VIEW lisk_stats AS (
   WITH
     tx_stats AS (SELECT
-      DATE_TRUNC('day', TIMESTAMP '2016-05-24 20:00:00' + tx."timestamp" * INTERVAL '1 second') "date",
+      DATE_TRUNC('day', TIMESTAMP '2016-05-24 17:00:00' + tx."timestamp" * INTERVAL '1 second') "date",
       COUNT(*) "cnt",
       SUM(tx."amount") :: NUMERIC * 0.00000001 "value",
       SUM(tx."fee") :: NUMERIC * 0.00000001 "fees",
@@ -17,12 +17,12 @@ CREATE MATERIALIZED VIEW lisk_stats AS (
       ),
     addrs AS (
       (SELECT
-        DATE_TRUNC('day', TIMESTAMP '2016-05-24 20:00:00' + tx."timestamp" * INTERVAL '1 second') "date",
+        DATE_TRUNC('day', TIMESTAMP '2016-05-24 17:00:00' + tx."timestamp" * INTERVAL '1 second') "date",
         tx."senderId" "addr"
       FROM trs tx)
       UNION ALL
       (SELECT
-        DATE_TRUNC('day', TIMESTAMP '2016-05-24 20:00:00' + tx."timestamp" * INTERVAL '1 second') "date",
+        DATE_TRUNC('day', TIMESTAMP '2016-05-24 17:00:00' + tx."timestamp" * INTERVAL '1 second') "date",
         tx."recipientId" "addr"
       FROM trs tx)
       ),
