@@ -14,7 +14,7 @@ time $PSQL -qc "REFRESH MATERIALIZED VIEW stellar_payment_stats_prep"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW monero_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW nem_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW neo_stats"
-time $PSQL -qc "REFRESH MATERIALIZED VIEW lisk_stats" lisk_main lisk
+time $PSQL -qc "REFRESH MATERIALIZED VIEW lisk.lisk_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW ethereum_short_tx"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW ethereum_classic_short_tx"
 
@@ -54,7 +54,7 @@ $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"med_fees\" \"medFees\", \"med_value\" \"medTxVolume\" FROM neo_stats WHERE \"asset\" = '\\xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b' ORDER BY \"date\"" -A -F "," -o "neo_neo.csv"
 
 # lisk
-$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"med_value\" \"medTxVolume\", \"med_fees\" \"medFees\", \"payment_cnt\" \"paymentCount\" FROM lisk_stats ORDER BY \"date\"" -A -F "," -o "lisk.csv" lisk_main lisk
+$PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\", \"med_value\" \"medTxVolume\", \"med_fees\" \"medFees\", \"payment_cnt\" \"paymentCount\" FROM lisk.lisk_stats ORDER BY \"date\"" -A -F "," -o "lisk.csv"
 
 # ethereum short tx
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\" FROM ethereum_short_tx ORDER BY \"date\"" -A -F "," -o "eth_short_tx.csv"
