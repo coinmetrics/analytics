@@ -7,7 +7,7 @@ CREATE MATERIALIZED VIEW erc20transfers AS (
       token."contractAddress" "contractAddress",
       SUBSTRING(log."topics"[2] FROM 12 FOR 20) "from",
       SUBSTRING(log."topics"[3] FROM 12 FOR 20) "to"
-      FROM ethereum block, UNNEST(block.transactions) tx INNER JOIN erc20tokens token ON tx.to = token."contractAddress", UNNEST(tx.logs) log
+      FROM ethereum block, UNNEST(block.transactions) tx, UNNEST(tx.logs) log INNER JOIN erc20tokens token ON log."address" = token."contractAddress"
       WHERE log."topics"[1] = E'\\xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'),
     txc AS (SELECT
       tx.*,
