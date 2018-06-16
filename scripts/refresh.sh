@@ -5,7 +5,7 @@ PSQL="psql -h 127.0.0.1 -U postgres"
 
 # update materialized views
 time $PSQL -qc "REFRESH MATERIALIZED VIEW erc20transfers"
-time $PSQL -qc "REFRESH MATERIALIZED VIEW ethereum_stats"
+time $PSQL -qf $(dirname "$0")/ethereum_stats.sql
 time $PSQL -qc "REFRESH MATERIALIZED VIEW ethereum_classic_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW cardano_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW ripple_payment_xrp_stats"
