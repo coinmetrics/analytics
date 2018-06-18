@@ -1,10 +1,19 @@
 CREATE MATERIALIZED VIEW iota_stats AS (
   WITH
+    txs AS (SELECT
+      tx."bundle" "bundle",
+      MAX(tx."timestamp") "timestamp",
+      MAX(tx."value") "value",
+      MAX(tx."address") "address",
+      MAX(tx."lastIndex") "lastIndex"
+      FROM iota tx
+      GROUP BY tx."bundle", tx."currentIndex"
+      ),
     bundles AS (SELECT
       tx."bundle" "bundle",
       MAX(tx."timestamp") "timestamp",
       SUM(GREATEST("value" :: NUMERIC, 0)) "value"
-      FROM iota tx
+      FROM txs tx
       GROUP BY tx."bundle"
       HAVING MAX(tx."lastIndex") + 1 = COUNT(*)
       ),
@@ -17,11 +26,11 @@ CREATE MATERIALIZED VIEW iota_stats AS (
       GROUP BY "date"
       ),
     tx_stats AS (SELECT
-      DATE_TRUNC('day', TO_TIMESTAMP(tx."timestamp")) "date",
+      DATE_TRUNC('day', TO_TIMESTAMP(bundle."timestamp")) "date",
       SUM(CASE WHEN tx."value" < 0 THEN 1 ELSE 0 END) "from_cnt",
       SUM(CASE WHEN tx."value" > 0 THEN 1 ELSE 0 END) "to_cnt",
       COUNT(DISTINCT tx."address") "addr_cnt"
-      FROM iota tx
+      FROM txs tx
       INNER JOIN bundles bundle ON tx."bundle" = bundle."bundle"
       GROUP BY "date"
       )
