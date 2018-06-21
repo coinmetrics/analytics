@@ -29,6 +29,7 @@ CREATE TEMPORARY TABLE ethereum_addr_stats AS (SELECT
   GROUP BY t."date"
 );
 
+CREATE INDEX ON ethereum_tx ("date");
 CREATE INDEX ON ethereum_tx ("contractAddress");
 
 -- ethereum stats
