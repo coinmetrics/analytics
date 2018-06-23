@@ -2,7 +2,7 @@ CREATE MATERIALIZED VIEW iota_stats AS (
   WITH
     txs AS (SELECT
       tx."bundle" "bundle",
-      MAX(tx."timestamp") "timestamp",
+      MAX(CASE WHEN tx."timestamp" >= 1000000000000 THEN tx."timestamp" / 1000 ELSE tx."timestamp" END) "timestamp",
       MAX(tx."value") "value",
       MAX(tx."address") "address",
       MAX(tx."lastIndex") "lastIndex"
@@ -21,7 +21,7 @@ CREATE MATERIALIZED VIEW iota_stats AS (
       DATE_TRUNC('day', TO_TIMESTAMP(bundle."timestamp")) "date",
       COUNT(*) "cnt",
       SUM(bundle."value") "value",
-      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY bundle."value") "med_value"
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY CASE WHEN bundle."value" <> 0 THEN bundle."value" ELSE NULL END) "med_value"
       FROM bundles bundle
       GROUP BY "date"
       ),

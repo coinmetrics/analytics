@@ -11,6 +11,7 @@ time $PSQL -qc "REFRESH MATERIALIZED VIEW cardano_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW ripple_payment_xrp_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW stellar_payment_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW stellar_payment_stats_prep"
+time $PSQL -qc "REFRESH MATERIALIZED VIEW iota_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW monero_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW nem_stats"
 time $PSQL -qc "REFRESH MATERIALIZED VIEW neo_stats"
@@ -42,6 +43,9 @@ $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date
 $PSQL -qc "\\pset footer off" -c "SELECT * FROM stellar_payment_stats_prep ORDER BY \"date\"" -A -F "," -o "stellar_payment.csv"
 # stellar XLM payments
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"value\" \"txVolume\", \"fees\" \"fees\", \"from_cnt\" \"fromAddrCount\", \"to_cnt\" \"toAddrCount\", \"addr_cnt\" \"addrCount\" FROM stellar_payment_stats WHERE \"asset\" = '' ORDER BY \"date\"" -A -F "," -o "stellar_payment_xlm.csv"
+
+# iota
+$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "med_value" "medTxVolume", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount" FROM iota_stats ORDER BY "date"' -A -F "," -o "iota.csv"
 
 # monero
 $PSQL -qc "\\pset footer off" -c "SELECT SUBSTRING(\"date\"::TEXT FOR 10) \"date\", \"cnt\" \"txCount\", \"reward\" - \"fees\" \"generatedCoins\", \"fees\" \"fees\", \"avg_difficulty\" \"avgDifficulty\", \"med_fees\" \"medFees\", \"io_cnt\" \"addrCount\", \"payment_cnt\" \"paymentCount\" FROM monero_stats ORDER BY \"date\"" -A -F "," -o "monero.csv"
