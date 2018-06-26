@@ -72,14 +72,22 @@ CREATE UNLOGGED TABLE ethereum_stats_traced AS (
       GROUP BY "date"),
     payments_stats AS (SELECT
       tx."date" "date",
-      COUNT(*) "cnt"
+      SUM(CASE WHEN tx."to" IS NOT NULL AND contract IS     NULL THEN 1 ELSE 0 END) "payment_cnt",
+      SUM(CASE WHEN tx."to" IS NOT NULL AND contract IS NOT NULL THEN 1 ELSE 0 END) "contract_cnt",
+      SUM(CASE WHEN tx."to" IS     NULL                          THEN 1 ELSE 0 END) "create_contract_cnt",
+      SUM(CASE WHEN tx."to" IS NOT NULL AND contract IS     NULL THEN tx."value" ELSE 0 END) "payment_value",
+      SUM(CASE WHEN tx."to" IS NOT NULL AND contract IS NOT NULL THEN tx."value" ELSE 0 END) "contract_value",
+      SUM(CASE WHEN tx."to" IS     NULL                          THEN tx."value" ELSE 0 END) "create_contract_value"
       FROM ethereum_tx tx LEFT JOIN ethereum_tx contract ON tx."to" = contract."contractAddress"
-      WHERE tx."to" IS NOT NULL AND contract IS NULL
-      GROUP BY tx."date")
+      GROUP BY tx."date"),
+    short_stats AS (SELECT
+      addr."min_date" "date",
+      SUM(addr."cnt") "cnt",
+      SUM(addr."positive_value") "value"
+      FROM ethereum_short_addrs addr GROUP BY addr."min_date")
     SELECT
       block."date" "date",
       tx."cnt" "tx_cnt",
-      payment."cnt" "payment_cnt",
       action."cnt" "action_cnt",
       tx."sum_value" "sum_value",
       tx."med_value" "med_value",
@@ -97,7 +105,15 @@ CREATE UNLOGGED TABLE ethereum_stats_traced AS (
       addr."cnt" "addr_cnt",
       action."from_cnt" "action_from_cnt",
       action."to_cnt" "action_to_cnt",
-      addr_action."cnt" "addr_action_cnt"
+      addr_action."cnt" "addr_action_cnt",
+      payment."payment_cnt" "payment_cnt",
+      payment."contract_cnt" "contract_cnt",
+      payment."create_contract_cnt" "create_contract_cnt",
+      payment."payment_value" "payment_value",
+      payment."contract_value" "contract_value",
+      payment."create_contract_value" "create_contract_value",
+      short."cnt" "short_cnt",
+      short."value" "short_value"
     FROM blocks_stats block
     LEFT JOIN uncles_stats uncle ON block."date" = uncle."date"
     LEFT JOIN txs_stats tx ON block."date" = tx."date"
@@ -105,5 +121,6 @@ CREATE UNLOGGED TABLE ethereum_stats_traced AS (
     LEFT JOIN actions_stats action ON block."date" = action."date"
     LEFT JOIN addr_actions_stats addr_action ON block."date" = addr_action."date"
     LEFT JOIN payments_stats payment ON block."date" = payment."date"
+    LEFT JOIN short_stats short ON block."date" = short."date"
     ORDER BY "date"
   );

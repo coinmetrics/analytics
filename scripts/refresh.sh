@@ -4,8 +4,6 @@
 PSQL='psql -h 127.0.0.1 -U postgres'
 
 # update materialized views
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW erc20transfers'
-time $PSQL -qf $(dirname "$0")/ethereum_stats.sql
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW ethereum_classic_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW cardano_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW ripple_payment_xrp_stats'
@@ -20,15 +18,6 @@ time $PSQL -qc 'REFRESH MATERIALIZED VIEW ethereum_short_tx'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW ethereum_classic_short_tx'
 
 ### export csv's
-
-# ERC20 tokens
-for SYMBOL in $($PSQL -qtc 'SELECT symbol FROM erc20tokens')
-do
-	$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "max_value" "maxOneTxVolume", "max_sum_from_value" "maxAddrSumFromValue", "max_sum_to_value" "maxAddrSumToValue", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_value" "medTxVolume" FROM erc20transfers WHERE "symbol" = '\'$SYMBOL\'' ORDER BY "date"' -A -F ',' -o "$SYMBOL.csv"
-done
-
-# ethereum
-$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING(e."date"::TEXT FOR 10) "date", e."tx_cnt" "txCount", e."sum_value" "txVolume", e."med_value" "medTxVolume", e."avg_difficulty" "avgDifficulty", e."avg_tx_size" "avgTxSize", e."sum_fee" "sumFee", e."block_cnt" "blockCount", e."sum_size" "totalSize", e."med_fee" "medFee", e."reward" "generatedVolume", e."from_cnt" "fromAddrCount", e."to_cnt" "toAddrCount", e."addr_cnt" "addrCount", e."payment_cnt" "paymentCount", es."cnt" "shortTxCount", es."value" "shortTxValue" FROM ethereum_stats e LEFT JOIN ethereum_short_tx es ON e."date" = es."date" ORDER BY e."date"' -A -F ',' -o 'eth_stats.csv'
 
 # ethereum classic
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING(e."date"::TEXT FOR 10) "date", e."tx_cnt" "txCount", e."sum_value" "txVolume", e."med_value" "medTxVolume", e."avg_difficulty" "avgDifficulty", e."avg_tx_size" "avgTxSize", e."sum_fee" "sumFee", e."block_cnt" "blockCount", e."sum_size" "totalSize", e."med_fee" "medFee", e."reward" "generatedVolume", e."from_cnt" "fromAddrCount", e."to_cnt" "toAddrCount", e."addr_cnt" "addrCount", e."payment_cnt" "paymentCount", es."cnt" "shortTxCount", es."value" "shortTxValue" FROM ethereum_classic_stats e LEFT JOIN ethereum_classic_short_tx es ON e."date" = es."date" ORDER BY "date"' -A -F ',' -o 'eth_classic_stats.csv'
