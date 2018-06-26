@@ -9,7 +9,7 @@ CREATE UNLOGGED TABLE ethereum_stats_traced AS (
       block."size" "size",
       ARRAY_LENGTH(block."transactions", 1) "tx_cnt",
       block."uncles" "uncles"
-      FROM ethereum_traced block),
+      FROM ethereum block),
     blocks_stats AS (SELECT
       block."date" "date",
       AVG(block."difficulty") "avg_difficulty",

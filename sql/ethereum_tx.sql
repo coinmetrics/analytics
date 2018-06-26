@@ -7,7 +7,7 @@ CREATE UNLOGGED TABLE ethereum_tx AS SELECT
   tx."contractAddress" "contractAddress",
   tx."value" * 1e-18 "value",
   (tx."gasUsed" * tx."gasPrice") * 1e-18 "fee"
-  FROM ethereum_traced block, UNNEST(block.transactions) tx
+  FROM ethereum block, UNNEST(block.transactions) tx
 ;
 ANALYZE ethereum_tx;
 

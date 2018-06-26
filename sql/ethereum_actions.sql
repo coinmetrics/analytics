@@ -5,7 +5,7 @@ CREATE UNLOGGED TABLE ethereum_actions AS SELECT
   action."from" "from",
   action."to" "to",
   action."value" * 1e-18 "value"
-  FROM ethereum_traced block, UNNEST(block.transactions) tx, UNNEST(tx.actions) action
+  FROM ethereum block, UNNEST(block.transactions) tx, UNNEST(tx.actions) action
   WHERE action."accounted"
 ;
 ANALYZE ethereum_actions;
