@@ -14,7 +14,6 @@ time $PSQL -qc 'REFRESH MATERIALIZED VIEW monero_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW nem_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW neo_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW lisk.lisk_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW ethereum_short_tx'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW ethereum_classic_short_tx'
 
 ### export csv's
@@ -48,9 +47,3 @@ $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", 
 
 # lisk
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_value" "medTxVolume", "med_fees" "medFees", "payment_cnt" "paymentCount" FROM lisk.lisk_stats ORDER BY "date"' -A -F ',' -o 'lisk.csv'
-
-# ethereum short tx
-$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume" FROM ethereum_short_tx ORDER BY "date"' -A -F ',' -o 'eth_short_tx.csv'
-
-# ethereum classic short tx
-$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume" FROM ethereum_classic_short_tx ORDER BY "date"' -A -F ',' -o 'eth_classic_short_tx.csv'
