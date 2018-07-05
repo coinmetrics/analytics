@@ -3,6 +3,7 @@ CREATE MATERIALIZED VIEW cardano_stats AS (
     tp AS (
       (SELECT
         tx."id" "txid",
+        tx."timeIssued" "time",
         input."address" "address",
         -input."value" "value",
         0 :: INTEGER "is_output"
@@ -11,11 +12,18 @@ CREATE MATERIALIZED VIEW cardano_stats AS (
       UNION ALL
       (SELECT
         tx."id" "txid",
+        tx."timeIssued" "time",
         output."address" "address",
         output."value" "value",
         1 :: INTEGER "is_output"
         FROM cardano block, UNNEST(block.transactions) tx, UNNEST(tx.outputs) output
         )
+      ),
+    short_addrs AS (SELECT
+      "address"
+      FROM tp
+      GROUP BY "address"
+      HAVING SUM("value") = 0 AND MAX("time") - MIN("time") <= 2400
       ),
     txio AS (SELECT
       "txid",
@@ -29,8 +37,11 @@ CREATE MATERIALIZED VIEW cardano_stats AS (
       "txid",
       -SUM("value") "fees",
       SUM(GREATEST("value", 0)) "volume",
+      SUM(CASE WHEN addr."address" IS NOT NULL THEN GREATEST("value", 0) ELSE NULL END) "short_volume",
       GREATEST(SUM("output_cnt") - 1, 0) "payment_cnt"
-      FROM txio GROUP BY "txid"
+      FROM txio
+      LEFT JOIN short_addrs addr ON txio."address" = addr."address"
+      GROUP BY "txid"
       ),
     txs AS (SELECT
       DATE_TRUNC('day', TO_TIMESTAMP(tx."timeIssued")) "date",
@@ -39,7 +50,8 @@ CREATE MATERIALIZED VIEW cardano_stats AS (
       SUM(txq."volume") "volume",
       PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY txq."volume") "med_volume",
       PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY txq."fees") "med_fees",
-      SUM(txq."payment_cnt") "payment_cnt"
+      SUM(txq."payment_cnt") "payment_cnt",
+      SUM(txq."short_volume") "short_volume"
       FROM cardano block, UNNEST(block.transactions) tx INNER JOIN txq ON tx."id" = txq."txid"
       GROUP BY "date"
       ),
@@ -79,6 +91,7 @@ CREATE MATERIALIZED VIEW cardano_stats AS (
       txs."med_volume" "med_volume",
       txs."med_fees" "med_fees",
       txs."payment_cnt" "payment_cnt",
+      txs."short_volume" "short_volume",
       tis."from_cnt" "from_cnt",
       tos."to_cnt" "to_cnt",
       tios."cnt" "addr_cnt"
