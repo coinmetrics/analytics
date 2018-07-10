@@ -15,6 +15,7 @@ time $PSQL -qc 'REFRESH MATERIALIZED VIEW nem_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW neo_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW lisk.lisk_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW ethereum_classic_short_tx'
+time $PSQL -qc 'REFRESH MATERIALIZED VIEW eos_stats'
 
 ### export csv's
 
@@ -47,3 +48,6 @@ $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", 
 
 # lisk
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_value" "medTxVolume", "med_fees" "medFees", "payment_cnt" "paymentCount" FROM lisk.lisk_stats ORDER BY "date"' -A -F ',' -o 'lisk.csv'
+
+# eos
+$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "med_value" "medTxVolume", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount" FROM eos_stats ORDER BY "date"' -A -F ',' -o 'eos.csv'
