@@ -16,6 +16,7 @@ time $PSQL -qc 'REFRESH MATERIALIZED VIEW neo_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW lisk.lisk_stats'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW ethereum_classic_short_tx'
 time $PSQL -qc 'REFRESH MATERIALIZED VIEW eos_stats'
+time $PSQL -qc 'REFRESH MATERIALIZED VIEW waves_stats'
 
 ### export csv's
 
