@@ -21,6 +21,7 @@ CREATE MATERIALIZED VIEW eos_stats AS (
 		action_stats AS (
 			SELECT
 				action."date" "date",
+				COUNT(*) "cnt",
 				SUM(action."value" * 0.0001) "value",
 				PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY action."value" * 0.0001) "med_value",
 				COUNT(DISTINCT action."from") "from_cnt",
@@ -43,6 +44,7 @@ CREATE MATERIALIZED VIEW eos_stats AS (
 	SELECT
 		tx."date" "date",
 		tx."cnt" "cnt",
+		action."cnt" "action_cnt",
 		action."value" "value",
 		action."med_value" "med_value",
 		action."from_cnt" "from_cnt",
