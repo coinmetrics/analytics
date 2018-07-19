@@ -38,7 +38,7 @@ $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", 
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "med_value" "medTxVolume", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount" FROM iota_stats ORDER BY "date"' -A -F ',' -o 'iota.csv'
 
 # monero
-$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "reward" - "fees" "generatedCoins", "fees" "fees", "avg_difficulty" "avgDifficulty", "med_fees" "medFees", "io_cnt" "addrCount", "payment_cnt" "paymentCount" FROM monero_stats ORDER BY "date"' -A -F ',' -o 'monero.csv'
+$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "reward" - "fees" "generatedCoins", "fees" "fees", "avg_difficulty" "avgDifficulty", "med_fees" "medFees", "io_cnt" "addrCount", "payment_cnt" "paymentCount", "block_cnt" "blockCount", "block_size" "blockSize" FROM monero_stats ORDER BY "date"' -A -F ',' -o 'monero.csv'
 
 # nem
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_value" "medTxVolume", "med_fees" "medFees" FROM nem_stats ORDER BY "date"' -A -F ',' -o 'nem.csv'
@@ -51,4 +51,4 @@ $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", 
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_value" "medTxVolume", "med_fees" "medFees", "payment_cnt" "paymentCount" FROM lisk.lisk_stats ORDER BY "date"' -A -F ',' -o 'lisk.csv'
 
 # eos
-$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "med_value" "medTxVolume", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount" FROM eos_stats ORDER BY "date"' -A -F ',' -o 'eos.csv'
+$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "tx_cnt" "txCount", "value" "txVolume", "med_value" "medTxVolume", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "action_cnt" "paymentCount", "block_cnt" "blockCount" FROM eos_stats ORDER BY "date"' -A -F ',' -o 'eos.csv'

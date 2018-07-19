@@ -40,19 +40,28 @@ CREATE MATERIALIZED VIEW eos_stats AS (
 					(SELECT "date", "to" "addr" FROM actions)
 				) t
 			GROUP BY "date"
+		),
+		block_stats AS (
+			SELECT
+				DATE_TRUNC('day', TO_TIMESTAMP(block."timestamp")) "date",
+				COUNT(*) "cnt"
+			FROM eos block
+			GROUP BY "date"
 		)
 	SELECT
-		tx."date" "date",
-		tx."cnt" "cnt",
+		block."date" "date",
+		block."cnt" "block_cnt",
+		tx."cnt" "tx_cnt",
 		action."cnt" "action_cnt",
 		action."value" "value",
 		action."med_value" "med_value",
 		action."from_cnt" "from_cnt",
 		action."to_cnt" "to_cnt",
 		addr."cnt" "addr_cnt"
-	FROM tx_stats tx
-	LEFT JOIN action_stats action ON tx."date" = action."date"
-	LEFT JOIN addr_stats addr ON tx."date" = addr."date"
-	ORDER BY tx."date"
+	FROM block_stats block
+	LEFT JOIN tx_stats tx ON block."date" = tx."date"
+	LEFT JOIN action_stats action ON block."date" = action."date"
+	LEFT JOIN addr_stats addr ON block."date" = addr."date"
+	ORDER BY block."date"
 ) WITH NO DATA
 ;

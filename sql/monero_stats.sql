@@ -2,6 +2,8 @@ CREATE MATERIALIZED VIEW monero_stats AS (
   WITH
     bs AS (SELECT
       DATE_TRUNC('day', TO_TIMESTAMP(block."timestamp")) "date",
+      COUNT(*) "cnt",
+      SUM(block."size") "size",
       SUM(block."reward" :: NUMERIC) * 1e-12 "reward",
       AVG(block."difficulty" :: NUMERIC) "avg_difficulty"
       FROM monero block
@@ -35,6 +37,8 @@ CREATE MATERIALIZED VIEW monero_stats AS (
       )
     SELECT
       bs."date" "date",
+      bs."cnt" "block_cnt",
+      bs."size" "block_size",
       bs."reward" "reward",
       bs."avg_difficulty" "avg_difficulty",
       txs."cnt" "cnt",
