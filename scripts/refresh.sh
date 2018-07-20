@@ -4,19 +4,80 @@
 PSQL='psql -h 127.0.0.1 -U postgres'
 
 # update materialized views
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW ethereum_classic_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW cardano_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW ripple_payment_xrp_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW stellar_payment_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW stellar_payment_stats_prep'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW iota_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW monero_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW nem_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW neo_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW lisk.lisk_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW ethereum_classic_short_tx'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW eos_stats'
-time $PSQL -qc 'REFRESH MATERIALIZED VIEW waves_stats'
+
+# ethereum classic
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''ethereum_classic'\'', (SELECT TO_TIMESTAMP(MAX(block."timestamp")) FROM ethereum_classic block)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW ethereum_classic_stats' \
+	-c 'COMMIT'
+
+# cardano
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''cardano'\'', (SELECT TO_TIMESTAMP(MAX(block."timeIssued")) FROM cardano block)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW cardano_stats' \
+	-c 'COMMIT'
+
+# ripple_payment_xrp
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''ripple_payment_xrp'\'', (SELECT TO_TIMESTAMP(MAX(ledger."closeTime")) FROM ripple ledger)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW ripple_payment_xrp_stats' \
+	-c 'COMMIT'
+
+# stellar_payment
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''stellar_payment'\'', (SELECT TO_TIMESTAMP(MAX(ledger."closeTime")) FROM stellar ledger)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW stellar_payment_stats' \
+	-c 'REFRESH MATERIALIZED VIEW stellar_payment_stats_prep' \
+	-c 'COMMIT'
+
+# iota
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''iota'\'', (SELECT TO_TIMESTAMP(MAX(CASE WHEN tx."timestamp" >= 1000000000000 THEN tx."timestamp" / 1000 ELSE tx."timestamp" END)) FROM iota tx)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW iota_stats' \
+	-c 'COMMIT'
+
+# monero
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''monero'\'', (SELECT TO_TIMESTAMP(MAX(block."timestamp")) FROM monero block)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW monero_stats' \
+	-c 'COMMIT'
+
+# nem
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''nem'\'', (SELECT TIMESTAMP '\''2015-03-29 00:06:25'\'' + MAX(block."timeStamp") * INTERVAL '\''1 second'\'' FROM nem block)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW nem_stats' \
+	-c 'COMMIT'
+
+# neo
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''neo'\'', (SELECT TO_TIMESTAMP(MAX(block."time")) FROM neo block)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW neo_stats' \
+	-c 'COMMIT'
+
+# lisk
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''lisk'\'', (SELECT TIMESTAMP '\''2016-05-24 17:00:00'\'' + MAX(block."timestamp") * INTERVAL '\''1 second'\'' FROM lisk.blocks block)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW lisk.lisk_stats' \
+	-c 'COMMIT'
+
+# ethereum_classic_short_tx
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''ethereum_classic_short_tx'\'', (SELECT TO_TIMESTAMP(MAX(block."timestamp")) FROM ethereum_classic block)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW ethereum_classic_short_tx' \
+	-c 'COMMIT'
+
+# eos
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''eos'\'', (SELECT TO_TIMESTAMP(MAX(block."timestamp")) FROM eos block)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW eos_stats' \
+	-c 'COMMIT'
+
+# waves
+time $PSQL -q -c 'BEGIN' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''waves'\'', (SELECT TO_TIMESTAMP(MAX(block."timestamp" * 0.001)) FROM waves block)) RETURNING *' \
+	-c 'REFRESH MATERIALIZED VIEW waves_stats' \
+	-c 'COMMIT'
+
 
 ### export csv's
 
