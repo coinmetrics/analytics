@@ -7,7 +7,7 @@ CREATE TEMPORARY TABLE ethereum_tx AS SELECT
   tx."contractAddress" "contractAddress",
   tx."value" * 1e-18 "value",
   (tx."gasUsed" * tx."gasPrice") * 1e-18 "fee"
-  FROM ethereum block, UNNEST(block.transactions) tx
+  FROM ethereum_classic block, UNNEST(block.transactions) tx
 ;
 ANALYZE ethereum_tx;
 
@@ -21,7 +21,7 @@ CREATE TEMPORARY TABLE ethereum_actions AS SELECT
   action."from" "from",
   action."to" "to",
   action."value" * 1e-18 "value"
-  FROM ethereum block, UNNEST(block.transactions) tx, UNNEST(tx.actions) action
+  FROM ethereum_classic block, UNNEST(block.transactions) tx, UNNEST(tx.actions) action
   WHERE action."accounted"
 ;
 ANALYZE ethereum_actions;
@@ -66,18 +66,18 @@ ANALYZE ethereum_short_addrs;
 CREATE INDEX ON ethereum_short_addrs("min_date");
 
 -- stats
-DROP TABLE IF EXISTS ethereum_stats_traced;
-CREATE UNLOGGED TABLE ethereum_stats_traced AS (
+DROP TABLE IF EXISTS ethereum_classic_stats_traced;
+CREATE UNLOGGED TABLE ethereum_classic_stats_traced AS (
   WITH
     blocks AS (SELECT
       DATE_TRUNC('day', TO_TIMESTAMP(block."timestamp")) "date",
-      CASE WHEN block."number" < 4370000 THEN 5 ELSE 3 END "reward",
+      5 :: NUMERIC * POWER(0.8 :: NUMERIC, FLOOR((block."number" - 1) / 5000000)) "reward",
       block."number" "number",
       block."difficulty" "difficulty",
       block."size" "size",
       ARRAY_LENGTH(block."transactions", 1) "tx_cnt",
       block."uncles" "uncles"
-      FROM ethereum block),
+      FROM ethereum_classic block),
     blocks_stats AS (SELECT
       block."date" "date",
       AVG(block."difficulty") "avg_difficulty",
@@ -88,7 +88,7 @@ CREATE UNLOGGED TABLE ethereum_stats_traced AS (
       FROM blocks block GROUP BY block."date"),
     uncles_stats AS (SELECT
       block."date" "date",
-      SUM((((uncle."number" - block."number") :: NUMERIC) * 0.125 + 1.03125) * block."reward") "reward"
+      SUM(CASE WHEN block."number" <= 5000000 THEN ((uncle."number" - block."number") :: NUMERIC) * 0.125 + 1.03125 ELSE 0.0625 :: NUMERIC END * block."reward") "reward"
       FROM blocks block, UNNEST(block."uncles") uncle GROUP BY block."date"),
     txs_stats AS (SELECT
       tx."date" "date",
