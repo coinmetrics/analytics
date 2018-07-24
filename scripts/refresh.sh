@@ -5,12 +5,6 @@ PSQL='psql -h 127.0.0.1 -U postgres'
 
 # update materialized views
 
-# ethereum classic
-time $PSQL -q -c 'BEGIN' \
-	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''ethereum_classic'\'', (SELECT TO_TIMESTAMP(MAX(block."timestamp")) FROM ethereum_classic block)) RETURNING *' \
-	-c 'REFRESH MATERIALIZED VIEW ethereum_classic_stats' \
-	-c 'COMMIT'
-
 # cardano
 time $PSQL -q -c 'BEGIN' \
 	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''cardano'\'', (SELECT TO_TIMESTAMP(MAX(block."timeIssued")) FROM cardano block)) RETURNING *' \
@@ -80,9 +74,6 @@ time $PSQL -q -c 'BEGIN' \
 
 
 ### export csv's
-
-# ethereum classic
-$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING(e."date"::TEXT FOR 10) "date", e."tx_cnt" "txCount", e."sum_value" "txVolume", e."med_value" "medTxVolume", e."avg_difficulty" "avgDifficulty", e."avg_tx_size" "avgTxSize", e."sum_fee" "sumFee", e."block_cnt" "blockCount", e."sum_size" "totalSize", e."med_fee" "medFee", e."reward" "generatedVolume", e."from_cnt" "fromAddrCount", e."to_cnt" "toAddrCount", e."addr_cnt" "addrCount", e."payment_cnt" "paymentCount", es."cnt" "shortTxCount", es."value" "shortTxValue" FROM ethereum_classic_stats e LEFT JOIN ethereum_classic_short_tx es ON e."date" = es."date" ORDER BY "date"' -A -F ',' -o 'eth_classic_stats.csv'
 
 # cardano
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "volume" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_volume" "medTxVolume", "med_fees" "medFees", "payment_cnt" "paymentCount", "short_volume" "shortTxVolume" FROM cardano_stats ORDER BY "date"' -A -F ',' -o 'cardano.csv'
