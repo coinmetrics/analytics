@@ -3,21 +3,19 @@ CREATE MATERIALIZED VIEW erc20transfers AS (
     tx AS (SELECT
       DATE_TRUNC('day', TO_TIMESTAMP(block.timestamp)) "date",
       (bn_in_hex(encode(log."data", 'hex')::cstring)::TEXT::NUMERIC / (10 ^ token."decimals")) "value",
-      token."symbol" "tokenSymbol",
-      token."contractAddress" "contractAddress",
+      token."symbol" "symbol",
       SUBSTRING(log."topics"[2] FROM 12 FOR 20) "from",
       SUBSTRING(log."topics"[3] FROM 12 FOR 20) "to"
       FROM ethereum block, UNNEST(block.transactions) tx, UNNEST(tx.logs) log INNER JOIN erc20tokens token ON log."address" = token."contractAddress"
       WHERE log."topics"[1] = E'\\xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'),
     txc AS (SELECT
       tx.*,
-      SUM("value") OVER (PARTITION BY "date", "contractAddress", "from") "sum_from_value",
-      SUM("value") OVER (PARTITION BY "date", "contractAddress", "to") "sum_to_value"
+      SUM("value") OVER (PARTITION BY "date", "symbol", "from") "sum_from_value",
+      SUM("value") OVER (PARTITION BY "date", "symbol", "to") "sum_to_value"
       FROM tx),
     txs AS (SELECT
-      MIN(txc."tokenSymbol") "symbol",
+      txc."symbol" "symbol",
       txc."date" "date",
-      txc."contractAddress" "contractAddress",
       COUNT(*) "cnt",
       SUM(txc."value") "value",
       MAX(txc."value") "max_value",
@@ -26,27 +24,27 @@ CREATE MATERIALIZED VIEW erc20transfers AS (
       MAX(txc."sum_to_value") "max_sum_to_value",
       COUNT(DISTINCT txc."from") "from_cnt",
       COUNT(DISTINCT txc."to") "to_cnt"
-      FROM txc GROUP BY txc."contractAddress", txc."date"
+      FROM txc GROUP BY txc."symbol", txc."date"
       ),
     addrs AS (
       SELECT
         tx."date" "date",
-        tx."contractAddress" "contractAddress",
+        tx."symbol" "symbol",
         tx."from" "addr"
       FROM tx
       UNION ALL
       SELECT
         tx."date" "date",
-        tx."contractAddress" "contractAddress",
+        tx."symbol" "symbol",
         tx."to" "addr"
       FROM tx
       ),
     addr_stats AS (SELECT
       t."date" "date",
-      t."contractAddress" "contractAddress",
+      t."symbol" "symbol",
       COUNT(DISTINCT t."addr") "cnt"
       FROM addrs t
-      GROUP BY t."contractAddress", t."date"
+      GROUP BY t."symbol", t."date"
       )
     SELECT
       txs."symbol" "symbol",
@@ -61,6 +59,6 @@ CREATE MATERIALIZED VIEW erc20transfers AS (
       txs."to_cnt" "to_cnt",
       addr_stats."cnt" "addr_cnt"
     FROM txs
-    LEFT JOIN addr_stats ON txs."date" = addr_stats."date" AND txs."contractAddress" = addr_stats."contractAddress"
+    LEFT JOIN addr_stats ON txs."date" = addr_stats."date" AND txs."symbol" = addr_stats."symbol"
     ORDER BY txs."date"
   ) WITH NO DATA;
