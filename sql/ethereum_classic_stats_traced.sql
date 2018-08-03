@@ -140,12 +140,12 @@ CREATE UNLOGGED TABLE ethereum_classic_stats_traced AS (
       GROUP BY "date"),
     payments_stats AS (SELECT
       tx."date" "date",
-      SUM(CASE WHEN tx."to" IS NOT NULL AND contract IS     NULL THEN 1 ELSE 0 END) "payment_cnt",
-      SUM(CASE WHEN tx."to" IS NOT NULL AND contract IS NOT NULL THEN 1 ELSE 0 END) "contract_cnt",
-      SUM(CASE WHEN tx."to" IS     NULL                          THEN 1 ELSE 0 END) "create_contract_cnt",
-      SUM(CASE WHEN tx."to" IS NOT NULL AND contract IS     NULL THEN tx."value" ELSE 0 END) "payment_value",
-      SUM(CASE WHEN tx."to" IS NOT NULL AND contract IS NOT NULL THEN tx."value" ELSE 0 END) "contract_value",
-      SUM(CASE WHEN tx."to" IS     NULL                          THEN tx."value" ELSE 0 END) "create_contract_value"
+      SUM(CASE WHEN tx."to" IS NOT NULL AND contract."contractAddress" IS     NULL THEN 1 ELSE 0 END) "payment_cnt",
+      SUM(CASE WHEN tx."to" IS NOT NULL AND contract."contractAddress" IS NOT NULL THEN 1 ELSE 0 END) "contract_cnt",
+      SUM(CASE WHEN tx."to" IS     NULL                                            THEN 1 ELSE 0 END) "create_contract_cnt",
+      SUM(CASE WHEN tx."to" IS NOT NULL AND contract."contractAddress" IS     NULL THEN tx."value" ELSE 0 END) "payment_value",
+      SUM(CASE WHEN tx."to" IS NOT NULL AND contract."contractAddress" IS NOT NULL THEN tx."value" ELSE 0 END) "contract_value",
+      SUM(CASE WHEN tx."to" IS     NULL                                            THEN tx."value" ELSE 0 END) "create_contract_value"
       FROM ethereum_tx tx LEFT JOIN ethereum_tx contract ON tx."to" = contract."contractAddress"
       GROUP BY tx."date"),
     short_stats AS (SELECT
