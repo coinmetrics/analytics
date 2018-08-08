@@ -5,10 +5,12 @@ CREATE MATERIALIZED VIEW eos_stats AS (
 				DATE_TRUNC('day', TO_TIMESTAMP(block."timestamp")) "date",
 				SUBSTRING(action."data" FOR 8) "from",
 				SUBSTRING(action."data" FROM 9 FOR 8) "to",
+				-- action."account" "asset_account",
 				-- ENCODE(TRIM(E'\\x00'::BYTEA FROM SUBSTRING(action."data" FROM 26 FOR 7)), 'escape') "asset",
 				reverse_bit64(('X' || ENCODE(SUBSTRING(action."data" FROM 17 FOR 8), 'hex'))::BIT(64))::BIGINT::NUMERIC "value"
 			FROM eos block, UNNEST(block.transactions) tx, UNNEST(tx.actions) action
 			WHERE action."name" = 'transfer'
+			AND action."account" = 'eosio.token'
 			AND ENCODE(TRIM(E'\\x00'::BYTEA FROM SUBSTRING(action."data" FROM 26 FOR 7)), 'escape') = 'EOS'
 		),
 		tx_stats AS (
