@@ -17,11 +17,11 @@ time $PSQL -q -c 'BEGIN' \
 	-c 'REFRESH MATERIALIZED VIEW ripple_payment_xrp_stats' \
 	-c 'COMMIT'
 
-# stellar_payment
+# stellar
 time $PSQL -q -c 'BEGIN' \
-	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''stellar_payment'\'', (SELECT TO_TIMESTAMP(MAX(ledger."closeTime")) FROM stellar ledger)) RETURNING *' \
+	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''stellar'\'', (SELECT TO_TIMESTAMP(MAX(ledger."closeTime")) FROM stellar ledger)) RETURNING *' \
 	-c 'REFRESH MATERIALIZED VIEW stellar_payment_stats' \
-	-c 'REFRESH MATERIALIZED VIEW stellar_payment_stats_prep' \
+	-c 'REFRESH MATERIALIZED VIEW stellar_stats' \
 	-c 'COMMIT'
 
 # iota
@@ -82,7 +82,7 @@ $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", 
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fee" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "block_cnt" "blockCount", "missing_block_cnt" "missingBlockCount", "total_cnt" "totalTxCount", "missing_cnt" "missingTxCount" FROM ripple_payment_xrp_stats ORDER BY "date"' -A -F ',' -o 'ripple_payment_xrp.csv'
 
 # stellar payments
-$PSQL -qc "\\pset footer off" -c 'SELECT * FROM stellar_payment_stats_prep ORDER BY "date"' -A -F ',' -o 'stellar_payment.csv'
+$PSQL -qc "\\pset footer off" -c 'SELECT * FROM stellar_stats ORDER BY "date"' -A -F ',' -o 'stellar.csv'
 # stellar XLM payments
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount" FROM stellar_payment_stats WHERE "asset" = '\'\'' ORDER BY "date"' -A -F ',' -o 'stellar_payment_xlm.csv'
 
