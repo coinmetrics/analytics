@@ -54,12 +54,6 @@ time $PSQL -q -c 'BEGIN' \
 	-c 'REFRESH MATERIALIZED VIEW lisk.lisk_stats' \
 	-c 'COMMIT'
 
-# ethereum_classic_short_tx
-time $PSQL -q -c 'BEGIN' \
-	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''ethereum_classic_short_tx'\'', (SELECT TO_TIMESTAMP(MAX(block."timestamp")) FROM ethereum_classic block)) RETURNING *' \
-	-c 'REFRESH MATERIALIZED VIEW ethereum_classic_short_tx' \
-	-c 'COMMIT'
-
 # eos
 time $PSQL -q -c 'BEGIN' \
 	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''eos'\'', (SELECT TO_TIMESTAMP(MAX(block."timestamp")) FROM eos block)) RETURNING *' \
