@@ -3,7 +3,9 @@
 PSQL="psql -h 127.0.0.1 -U postgres"
 
 # update tables
-time $PSQL -f $(dirname "$0")/ethereum_stats_traced.sql
+time $PSQL -f $(dirname "$0")/ethereum_contracts.sql
+time $PSQL -f $(dirname "$0")/ethereum_short_addrs.sql
+time $PSQL -f $(dirname "$0")/ethereum_stats_traced_incremental.sql
 time $PSQL -f $(dirname "$0")/ethereum_classic_stats_traced.sql
 
 ### export csv's

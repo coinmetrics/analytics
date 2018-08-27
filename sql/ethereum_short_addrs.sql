@@ -12,20 +12,20 @@ INSERT INTO ethereum_short_addrs SELECT
   COUNT(*) "cnt",
   SUM(GREATEST(t."value", 0)) "positive_value",
   MIN(t."time") "min_time",
-  DATE_TRUNC('day', TO_TIMESTAMP(MIN(t."time"))) "min_date"
+  DATE_TRUNC('day', TIMESTAMP 'epoch' + MIN(t."time") * INTERVAL '1 second') "min_date"
   FROM (
     (SELECT
-      tx."time" "time",
+      block."timestamp" "time",
       tx."from" "address",
-      -(tx."value" + tx."fee") "value"
-      FROM ethereum_tx tx
+      (tx."value" + tx."gasUsed" * tx."gasPrice") * -1e-18 "value"
+      FROM ethereum block, UNNEST(block.transactions) tx
       )
     UNION ALL
     (SELECT
-      tx."time" "time",
+      block."timestamp" "time",
       tx."to" "address",
-      tx."value" "value"
-      FROM ethereum_tx tx
+      tx."value" * 1e-18 "value"
+      FROM ethereum block, UNNEST(block.transactions) tx
       )
   ) t
   GROUP BY t."address"
