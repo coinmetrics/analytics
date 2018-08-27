@@ -8,7 +8,7 @@ CREATE MATERIALIZED VIEW ripple_payment_xrp_stats AS (
         tx."account" "from",
         tx."destination" "to"
       FROM ripple ledger, UNNEST(ledger.transactions) tx
-      WHERE tx."type" = 'Payment' AND tx."currency" IS NULL AND tx."account" <> tx."destination"
+      WHERE tx."result" = 'tesSUCCESS' AND tx."type" = 'Payment' AND tx."currency" IS NULL AND tx."account" <> tx."destination"
       ),
     txs AS (
       SELECT
