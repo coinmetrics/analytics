@@ -1,26 +1,21 @@
 CREATE MATERIALIZED VIEW stellar_payment_stats AS (
   WITH
-    tx1 AS (
+    op_stats AS (
       SELECT
         DATE_TRUNC('day', TO_TIMESTAMP(ledger."closeTime")) "date",
-        SUM(COALESCE(op."amount", 0) + COALESCE(op."startingBalance", 0)) OVER w :: NUMERIC * 0.0000001 "value",
-        ROW_NUMBER() OVER w op_index,
-        tx."fee" :: NUMERIC * 0.0000001 "fee",
+        COUNT(DISTINCT (ledger."sequence", tx."ordinality")) "cnt",
+        SUM((COALESCE(op."amount", 0) + COALESCE(op."startingBalance", 0)) :: NUMERIC * 0.0000001) "value",
         COALESCE((op."asset")."assetCode", '') "asset"
       FROM stellar ledger, UNNEST(ledger.transactions) WITH ORDINALITY tx, UNNEST(tx.operations) op
       WHERE (op."type" = 0 OR op."type" = 1) AND (op."sourceAccount" IS NOT NULL OR tx."sourceAccount" <> op."destination") AND op."sourceAccount" <> op."destination"
-      WINDOW w AS (PARTITION BY ledger."sequence", tx."ordinality")
+      GROUP BY "date", COALESCE((op."asset")."assetCode", '')
       ),
-    txs AS (
+    tx_stats AS (
       SELECT
-        tx1."date" "date",
-        tx1."asset" "asset",
-        COUNT(*) "cnt",
-        SUM(tx1."value") "value",
-        SUM(tx1."fee") "fees"
-      FROM tx1
-      WHERE "op_index" = 1
-      GROUP BY "date", "asset"
+        DATE_TRUNC('day', TO_TIMESTAMP(ledger."closeTime")) "date",
+        SUM(tx."fee" :: NUMERIC * 0.0000001) "fees"
+      FROM stellar ledger, UNNEST(ledger.transactions) WITH ORDINALITY tx
+      GROUP BY "date"
       ),
     addr_stats AS (
       SELECT
@@ -55,16 +50,17 @@ CREATE MATERIALIZED VIEW stellar_payment_stats AS (
       GROUP BY t."date", t."asset"
       )
     SELECT
-      txs."date" "date",
-      txs."asset" "asset",
-      txs."cnt" "cnt",
-      txs."value" "value",
-      txs."fees" "fees",
+      op."date" "date",
+      op."asset" "asset",
+      op."cnt" "cnt",
+      op."value" "value",
+      tx."fees" "fees",
       addr_stats."from_cnt" "from_cnt",
       addr_stats."to_cnt" "to_cnt",
       addr_stats2."cnt" "addr_cnt"
-    FROM txs
-    LEFT JOIN addr_stats ON txs."date" = addr_stats."date" AND txs."asset" = addr_stats."asset"
-    LEFT JOIN addr_stats2 ON txs."date" = addr_stats2."date" AND txs."asset" = addr_stats2."asset"
-    ORDER BY txs."date", txs."asset"
+    FROM op_stats op
+    LEFT JOIN tx_stats tx ON op."date" = tx."date"
+    LEFT JOIN addr_stats ON op."date" = addr_stats."date" AND op."asset" = addr_stats."asset"
+    LEFT JOIN addr_stats2 ON op."date" = addr_stats2."date" AND op."asset" = addr_stats2."asset"
+    ORDER BY op."date", op."asset"
   ) WITH NO DATA;
