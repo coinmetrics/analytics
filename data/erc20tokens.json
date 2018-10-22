@@ -310,5 +310,35 @@
 		"name": "QASH",
 		"symbol": "QASH",
 		"decimals": 6
+	},
+	{
+		"contractAddress": "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359",
+		"name": "Dai Stablecoin v1.0",
+		"symbol": "DAI",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0x8dd5fbce2f6a956c3022ba3663759011dd51e73e",
+		"name": "TrueUSD",
+		"symbol": "TUSD",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0x8e870d67f660d95d5be530380d0ec0bd388289e1",
+		"name": "Paxos Standard",
+		"symbol": "PAX",
+		"decimals": 18
+	},
+	{
+		"contractAddress": "0x056fd409e1d7a124bd7017459dfea2f387b6d5cd",
+		"name": "Gemini dollar",
+		"symbol": "GUSD",
+		"decimals": 2
+	},
+	{
+		"contractAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+		"name": "USD//C",
+		"symbol": "USDC",
+		"decimals": 6
 	}
 ]
