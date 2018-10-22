@@ -14,7 +14,7 @@ time $PSQL -q -c 'BEGIN' \
 # ripple_payment_xrp
 time $PSQL -q -c 'BEGIN' \
 	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''ripple_payment_xrp'\'', (SELECT TO_TIMESTAMP(MAX(ledger."closeTime")) FROM ripple ledger)) RETURNING *' \
-	-c 'REFRESH MATERIALIZED VIEW ripple_payment_xrp_stats' \
+	-f "${ANALYTICS_DIR}ripple_payment_xrp_stats_incremental.sql" \
 	-c 'COMMIT'
 
 # stellar
@@ -73,7 +73,7 @@ time $PSQL -q -c 'BEGIN' \
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "volume" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_volume" "medTxVolume", "med_fees" "medFees", "payment_cnt" "paymentCount", "short_volume" "shortTxVolume" FROM cardano_stats ORDER BY "date"' -A -F ',' -o 'cardano.csv'
 
 # ripple XRP payments
-$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fee" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "block_cnt" "blockCount", "missing_block_cnt" "missingBlockCount", "total_cnt" "totalTxCount", "missing_cnt" "missingTxCount" FROM ripple_payment_xrp_stats ORDER BY "date"' -A -F ',' -o 'ripple_payment_xrp.csv'
+$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "payment_cnt" "paymentCount", "payment_value" "txVolume", "fee" "fees", "med_fee" "medianFee", "med_payment_value" "medianTxValue", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "block_cnt" "blockCount", "missing_block_cnt" "missingBlockCount", "missing_cnt" "missingTxCount" FROM ripple_payment_xrp_stats ORDER BY "date"' -A -F ',' -o 'ripple_payment_xrp.csv'
 
 # stellar payments
 $PSQL -qc "\\pset footer off" -c 'SELECT * FROM stellar_stats ORDER BY "date"' -A -F ',' -o 'stellar.csv'
