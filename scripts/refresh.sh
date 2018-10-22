@@ -45,7 +45,7 @@ time $PSQL -q -c 'BEGIN' \
 # neo
 time $PSQL -q -c 'BEGIN' \
 	-c 'INSERT INTO analytics_stats ("view", "sync_time") VALUES ('\''neo'\'', (SELECT TO_TIMESTAMP(MAX(block."time")) FROM neo block)) RETURNING *' \
-	-c 'REFRESH MATERIALIZED VIEW neo_stats' \
+	-f ${ANALYTICS_DIR}neo_stats_incremental.sql \
 	-c 'COMMIT'
 
 # lisk
@@ -94,7 +94,10 @@ $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", 
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_fees" "medFees", "med_value" "medTxVolume" FROM neo_stats WHERE "asset" = '\''\xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b'\'' ORDER BY "date"' -A -F ',' -o 'neo_neo.csv'
 
 # lisk
-$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_value" "medTxVolume", "med_fees" "medFees", "payment_cnt" "paymentCount" FROM lisk.lisk_stats ORDER BY "date"' -A -F ',' -o 'lisk.csv'
+$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_value" "medTxVolume", "med_fees" "medFees", "payment_cnt" "paymentCount" FROM lisk_stats ORDER BY "date"' -A -F ',' -o 'lisk.csv' lisk_main
 
 # eos
 $PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "tx_cnt" "txCount", "value" "txVolume", "med_value" "medTxVolume", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "action_cnt" "paymentCount", "block_cnt" "blockCount" FROM eos_stats ORDER BY "date"' -A -F ',' -o 'eos.csv'
+
+# waves
+$PSQL -qc "\\pset footer off" -c 'SELECT SUBSTRING("date"::TEXT FOR 10) "date", "cnt" "txCount", "value" "txVolume", "fees" "fees", "from_cnt" "fromAddrCount", "to_cnt" "toAddrCount", "addr_cnt" "addrCount", "med_value" "medTxVolume", "med_fees" "medFees" FROM waves_stats ORDER BY "date"' -A -F ',' -o 'waves.csv'
