@@ -24,7 +24,7 @@ DO $$DECLARE
   begin_day TIMESTAMP;
   cur_day TIMESTAMP;
 BEGIN
-  SELECT COALESCE(MAX(stat."date"), TO_TIMESTAMP(0)) INTO STRICT begin_day FROM ripple_payment_xrp_stats stat;
+  SELECT COALESCE(MAX(stat."date"), TIMESTAMP 'epoch') INTO STRICT begin_day FROM ripple_payment_xrp_stats stat;
   DELETE FROM ripple_payment_xrp_stats WHERE "date" >= begin_day;
   FOR cur_day IN SELECT
     DATE_TRUNC('day', TIMESTAMP 'epoch' + ledger."closeTime" * INTERVAL '1 second') "date"
@@ -35,7 +35,7 @@ BEGIN
       WITH
         txs AS (
           SELECT
-            DATE_TRUNC('day', TO_TIMESTAMP(tx."date")) "date",
+            DATE_TRUNC('day', TIMESTAMP 'epoch' + ledger."closeTime" * INTERVAL '1 second') "date",
             tx."fee" * 0.000001 "fee",
             tx."account" "from",
             tx."destination" "to"
@@ -45,7 +45,7 @@ BEGIN
           ),
         payments AS (
           SELECT
-            DATE_TRUNC('day', TO_TIMESTAMP(tx."date")) "date",
+            DATE_TRUNC('day', TIMESTAMP 'epoch' + ledger."closeTime" * INTERVAL '1 second') "date",
             tx."amount" * 0.000001 "amount"
           FROM ripple ledger, UNNEST(ledger.transactions) tx
           WHERE DATE_TRUNC('day', TIMESTAMP 'epoch' + ledger."closeTime" * INTERVAL '1 second') = cur_day
@@ -73,7 +73,7 @@ BEGIN
           ),
         missing_txs AS (
           SELECT
-            DATE_TRUNC('day', TO_TIMESTAMP(ledger."closeTime")) "date1",
+            DATE_TRUNC('day', TIMESTAMP 'epoch' + ledger."closeTime" * INTERVAL '1 second') "date1",
             COUNT(*) "cnt"
           FROM ripple ledger, UNNEST(ledger.transactions) tx
           WHERE DATE_TRUNC('day', TIMESTAMP 'epoch' + ledger."closeTime" * INTERVAL '1 second') = cur_day
@@ -98,7 +98,7 @@ BEGIN
           ),
         blocks_stats AS (
           SELECT
-            DATE_TRUNC('day', TO_TIMESTAMP(ledger."closeTime")) "date1",
+            DATE_TRUNC('day', TIMESTAMP 'epoch' + ledger."closeTime" * INTERVAL '1 second') "date1",
             COUNT(*) "cnt",
             MAX(ledger."index") - MIN(ledger."index") + 1 - COUNT(*) "missing_cnt"
           FROM ripple ledger
