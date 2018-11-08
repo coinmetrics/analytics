@@ -2,10 +2,10 @@ CREATE MATERIALIZED VIEW erc20transfers AS (
   WITH
     tx AS (SELECT
       DATE_TRUNC('day', TO_TIMESTAMP(block.timestamp)) "date",
-      (bn_in_hex(encode(log."data", 'hex')::cstring)::TEXT::NUMERIC / (10 ^ token."decimals")) "value",
+      (bn_in_hex(encode(log."data", 'hex')::cstring)::TEXT::NUMERIC / (10 ^ token."decimals"))::NUMERIC "value",
       token."symbol" "symbol",
-      SUBSTRING(log."topics"[2] FROM 12 FOR 20) "from",
-      SUBSTRING(log."topics"[3] FROM 12 FOR 20) "to"
+      SUBSTRING(log."topics"[2] FROM 13 FOR 21) "from",
+      SUBSTRING(log."topics"[3] FROM 13 FOR 21) "to"
       FROM ethereum block, UNNEST(block.transactions) tx, UNNEST(tx.logs) log INNER JOIN erc20tokens token ON log."address" = token."contractAddress"
       WHERE log."topics"[1] = E'\\xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'),
     txc AS (SELECT
