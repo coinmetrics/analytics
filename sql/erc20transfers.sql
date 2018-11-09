@@ -2,7 +2,7 @@ CREATE MATERIALIZED VIEW erc20transfers AS (
   WITH
     tx AS (SELECT
       DATE_TRUNC('day', TO_TIMESTAMP(block.timestamp)) "date",
-      (bn_in_hex(encode(log."data", 'hex')::cstring)::TEXT::NUMERIC / (10 ^ token."decimals"))::NUMERIC "value",
+      (bn_in_hex(encode(log."data", 'hex')::cstring)::TEXT::NUMERIC(100, 18) / POWER(10::NUMERIC, token."decimals"::NUMERIC)::NUMERIC(100, 18))::NUMERIC "value",
       token."symbol" "symbol",
       SUBSTRING(log."topics"[2] FROM 13 FOR 20) "from",
       SUBSTRING(log."topics"[3] FROM 13 FOR 20) "to"
