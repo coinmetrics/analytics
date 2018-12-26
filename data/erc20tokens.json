@@ -335,10 +335,17 @@
 		"symbol": "GUSD",
 		"decimals": 2
 	},
+	
 	{
 		"contractAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
 		"name": "USD//C",
 		"symbol": "USDC",
 		"decimals": 6
+	},
+	{
+		"contractAddress": "0x508325285114821151a18e148f4299ea09a9ca05",
+		"name": "HKDT",
+		"symbol": "HKDT",
+		"decimals": 18
 	}
 ]
