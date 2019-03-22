@@ -9,7 +9,8 @@ CREATE MATERIALIZED VIEW eos_stats AS (
 				-- ENCODE(TRIM(E'\\x00'::BYTEA FROM SUBSTRING(action."data" FROM 26 FOR 7)), 'escape') "asset",
 				reverse_bit64(('X' || ENCODE(SUBSTRING(action."data" FROM 17 FOR 8), 'hex'))::BIT(64))::BIGINT::NUMERIC "value"
 			FROM eos block, UNNEST(block.transactions) tx, UNNEST(tx.actions) action
-			WHERE action."name" = 'transfer'
+			WHERE tx."status" = 'executed'
+			AND action."name" = 'transfer'
 			AND action."account" = 'eosio.token'
 			AND ENCODE(TRIM(E'\\x00'::BYTEA FROM SUBSTRING(action."data" FROM 26 FOR 7)), 'escape') = 'EOS'
 		),
